@@ -10,6 +10,7 @@ if os.getenv("CQLENG_ALLOW_SCHEMA_MANAGEMENT") is None:
 class Settings(BaseSettings):
     db_client_id: str = Field(..., env="ASTRA_DB_CLIENT_ID")
     db_client_secret: str = Field(..., env="ASTRA_DB_CLIENT_SECRET")
+    redis_url: str = Field(..., env="REDIS_URL")
 
     class Config:
         env_file = ".env"

@@ -1,3 +1,6 @@
 venv
 .env
 app/ignored/
+.mypy_cache/
+.pyc
+__pycache__
