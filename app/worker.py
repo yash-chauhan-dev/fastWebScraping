@@ -4,7 +4,8 @@ from celery import Celery
 from celery.schedules import crontab
 from celery.signals import beat_init, worker_process_init
 
-from app import config, db, models
+from app import config, crud, db, models, scraper
+from app.schema import schema
 
 celery_app = Celery(__name__)
 settings = config.get_settings()
@@ -48,7 +49,16 @@ def list_products():
 
 @celery_app.task
 def scrape_asin(asin):
-    print(asin)
+    s = scraper.Scrapper(asin=asin, endless_scroll=True)
+    dataset = s.scrape()
+    try:
+        validated_data = schema.ProductListSchema(**dataset)
+    except Exception:
+        validated_data = None
+    if validated_data is not None:
+        crud.add_scrape_event(validated_data.dict())
+        return asin, True
+    return asin, False
 
 
 @celery_app.task
